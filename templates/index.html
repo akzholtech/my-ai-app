@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My FastAPI project</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
+
+  body {
+    margin: 0;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .login-box {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    padding: 2.5rem;
+    color: white;
+    text-align: center;
+  }
+
+  .login-box h2 {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  .input-group {
+    position: relative;
+    margin-bottom: 1.8rem;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 12px 10px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(255,255,255,0.5);
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  .input-group label {
+    position: absolute;
+    top: 14px;
+    left: 10px;
+    color: rgba(255,255,255,0.7);
+    font-size: 1rem;
+    pointer-events: none;
+    transition: all 0.3s ease;
+  }
+
+  .input-group input:focus {
+    border-color: #fff;
+  }
+
+  .input-group input:focus + label,
+  .input-group input:not(:placeholder-shown) + label {
+    top: -12px;
+    left: 0;
+    font-size: 0.8rem;
+    color: #fff;
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 25px;
+    background: #fff;
+    color: #2575fc;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .login-btn:hover {
+    background: #b3c7ff;
+  }
+
+  .forgot-password {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .forgot-password a {
+    color: #e0e0e0;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .forgot-password a:hover {
+    color: #fff;
+  }
+
+  .ai-svg {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    fill: url(#gradient1);
+    stroke: #ffffffcc;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.7));
+  }
+</style>
+</head>
+<body>
+  <div class="login-box">
+    <!-- Vivid AI SVG Illustration -->
+    <svg class="ai-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="AI Robot Head">
+      <defs>
+        <linearGradient id="gradient1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#6a11cb" />
+          <stop offset="100%" stop-color="#2575fc" />
+        </linearGradient>
+      </defs>
+      <circle cx="32" cy="32" r="30" fill="url(#gradient1)" />
+      <rect x="16" y="24" width="32" height="20" rx="5" ry="5" fill="white" />
+      <circle cx="24" cy="34" r="4" fill="#2575fc" />
+      <circle cx="40" cy="34" r="4" fill="#6a11cb" />
+      <rect x="26" y="44" width="12" height="4" rx="2" ry="2" fill="#6a11cb" />
+      <line x1="32" y1="4" x2="32" y2="16" stroke="white" stroke-width="2" />
+      <line x1="16" y1="32" x2="8" y2="32" stroke="white" stroke-width="2" />
+      <line x1="56" y1="32" x2="48" y2="32" stroke="white" stroke-width="2" />
+      <line x1="32" y1="48" x2="32" y2="56" stroke="white" stroke-width="2" />
+      <line x1="20" y1="20" x2="12" y2="12" stroke="white" stroke-width="2" />
+      <line x1="44" y1="20" x2="52" y2="12" stroke="white" stroke-width="2" />
+      <line x1="20" y1="44" x2="12" y2="52" stroke="white" stroke-width="2" />
+      <line x1="44" y1="44" x2="52" y2="52" stroke="white" stroke-width="2" />
+    </svg>
+
+    <h2>Қош келдіңіз!</h2>
+    <form>
+      <button class="login-btn" onclick="streaming(600, 400)">Face ID</button>
+      <div class="forgot-password">
+        <a href="#" disabled>Face ID кіріңіз</a>
+      </div>
+    </form>
+  </div>
+  <script>
+      function streaming(w, h) {
+          const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft: screen.left
+          const dualScreenTop = window.screenTop !== undefined ? window.screenTop : screen.top
+          const width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ?
+                        document.documentElement.clientWidth : screen.width;
+          const height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ?
+                        document.documentElement.clientHeight : screen.height;
+          const left = dualScreenLeft + (width - w) / 2
+          const top = dualScreenTop + (height - h) / 2
+          window.open('run-recognition', 'VideoStream', `width=600, height=450,left=${left},top=${top}`)
+      }
+  </script>
+</body>
+</html>
