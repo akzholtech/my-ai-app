@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from fastapi import APIRouter, Request, Depends, Path, HTTPException
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 from fastapi.responses import HTMLResponse
 from fastapi.responses import StreamingResponse
 from pydantic import Field, BaseModel
@@ -7,13 +10,13 @@ from sqlalchemy.orm import Session
 from typing import Annotated
 
 from starlette import status
-from .auth import get_current_user
-from services import face_net
+from .auth import get_current_user, user_authentication, create_access_token, Token
 from modules import Users, Base
 from database import engine, SessionLocal
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+
 Base.metadata.create_all(bind=engine)
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
@@ -30,47 +33,22 @@ class UserLogin(BaseModel):
     name: str = Field(min_length=1, max_length=64)
     password: str = Field(min_length=1)
 
-@router.get("/")
-async def root(request: Request, db: db_dependency):
-    return db.query(Users).all()
-    # return templates.TemplateResponse('index.html', context={'request': request})
+###Pages###
 
+@router.get("/login", response_class=HTMLResponse)
+async def login(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
-@router.get("/todo/{todo_id}", status_code=status.HTTP_200_OK)
-async  def get_todo_by_id(db: db_dependency, todo_id: int = Path(gt=0)):
-    todo_item = db.query(Users).filter(Users.id == todo_id).first()
-    if todo_item is not None:
-        return todo_item
-    raise HTTPException(status_code=404, detail="todo not found")
+###Endpoints###
 
+@router.post("/api/login", response_model=Token)
+async def login(db: db_dependency, user_req: UserLogin):
+    user = user_authentication(user_req.name, user_req.password, db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Username or password incorrect!")
 
-@router.post("/todo", status_code=status.HTTP_201_CREATED)
-async def create_todo(user: user_dependency,
-                      db: db_dependency, todo: UserLogin):
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
-
-    todo_model = Users(**todo.model_dump())
-    db.add(todo_model)
-    db.commit()
-
-@router.put("/todo/{todo_id}", status_code=status.HTTP_200_OK)
-async def update_data(db: db_dependency, todo: UserLogin, todo_id: int = Path(gt=0)):
-    todo_item = db.query(Users).filter(Users.id == todo_id).first()
-    if todo_item is None:
-        raise HTTPException(status_code=404, detail="not found item by the id")
-    todo_item.name = todo.name
-    todo_item.password = todo.password
-    db.add(todo_item)
-    db.commit()
-
-@router.delete("todo/{todo_id}", status_code=status.HTTP_200_OK)
-async def delete_todo(db: db_dependency, todo_id: int = Path(gt=0)):
-    todo_item = db.query(Users).filter(Users.id == todo_id).first()
-    if todo_item is None:
-        raise HTTPException(status_code=404, detail="not found item by the id")
-    db.query(Users).filter(Users.id == todo_id).delete()
-    db.commit()
+    token = create_access_token(user.username, user.id, user.role, expires_delta=timedelta(minutes=5))
+    return {'access_token': token, 'token_type': 'bearer'}
 # @router.get("/run-recognition", response_class=HTMLResponse)
 # async def run_recognition(request: Request, db: db_dependency):
 #     async def event_generator():

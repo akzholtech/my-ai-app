@@ -1,0 +1,25 @@
+{% include "layout.html" %}
+<script src="{{url_for('static', path='/js/verification.js')}}"></script>
+ <div class="dashboard-layout">
+  <nav class="sidebar">
+    <h2>Dashboard</h2>
+    <div class="menu-item active">Home</div>
+    <div class="menu-item">Profile</div>
+    <div class="menu-item">Settings</div>
+    <div class="menu-item">Analytics</div>
+    <div class="menu-item">Help</div>
+  </nav>
+
+  <div class="main-area">
+    <header class="header">
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </header>
+
+    <!-- Your main content below -->
+    <main class="content">
+      <!-- Content goes here -->
+    </main>
+  </div>
+</div>
+
+

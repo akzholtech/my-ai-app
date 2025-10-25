@@ -1,9 +1,11 @@
 from typing import Annotated
 from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
+from starlette.responses import RedirectResponse
 
 from database import SessionLocal
 from modules import Users
@@ -12,6 +14,7 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+security = HTTPBearer()
 SECRET_KEY = '286d960fdff634715693d16de0f1ccc49af84a5dfb3075f55e0b73cbe5cca9ca'
 ALGORITHM = 'HS256'
 
@@ -76,7 +79,7 @@ users_dependency = Annotated[dict, Depends(get_current_user)]
 @router.get('/users')
 async def get_users(user_dto: users_dependency, db: Session = Depends(get_db)):
     if user_dto is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Not authenticated')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Unauthorized in auth')
 
     users = db.query(Users).all()
     return {'users': users}
@@ -112,3 +115,12 @@ async def login_for_access_token(user_dto: users_dependency, form_data: Annotate
     token = create_access_token(user.username, user.id, user.role, expires_delta=timedelta(minutes=10))
 
     return {'access_token': token, 'token_type': 'bearer'}
+
+@router.get("/verify-token")
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return {"user": payload["sub"]}
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
