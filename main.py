@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from starlette.staticfiles import StaticFiles
 
-from routers import login_page, auth, dashboard
+from routers import login_page, auth, dashboard, admin, face_recognition
 
 app = FastAPI(title="Portfolio")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -9,4 +9,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(login_page.router)
 app.include_router(auth.router)
 app.include_router(dashboard.router)
+app.include_router(admin.router)
+app.include_router(face_recognition.router)
 

@@ -34,15 +34,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-class UserRequest(BaseModel):
-    username: str
-    password: str
-    first_name: str
-    last_name: str
-    email: str
-    role: str
-    embedding: str
-
 def user_authentication(username: str, password: str, db):
     user_auth = db.query(Users).filter(Users.username == username).first()
     if not user_auth:
@@ -84,29 +75,10 @@ async def get_users(user_dto: users_dependency, db: Session = Depends(get_db)):
     users = db.query(Users).all()
     return {'users': users}
 
-@router.post("/create", status_code=status.HTTP_200_OK)
-async def login(user_dto: users_dependency, db: db_dependency, new_user: UserRequest):
-    if user_dto is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Not authenticated')
-
-    user_model = Users(
-        username=new_user.username,
-        hashed_password=pwd_context.hash(new_user.password),
-        email=new_user.email,
-        first_name=new_user.first_name,
-        last_name=new_user.last_name,
-        role=new_user.role,
-    )
-    db.add(user_model)
-    db.commit()
-    db.refresh(user_model)
 
 @router.post("/token", response_model=Token)
-async def login_for_access_token(user_dto: users_dependency, form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  db: db_dependency):
-    if user_dto is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Not authenticated')
-
     user = user_authentication(form_data.username, form_data.password, db)
 
     if not user:
