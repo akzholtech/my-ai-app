@@ -1,16 +1,14 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, Request
 from passlib.context import CryptContext
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from starlette import status
 from starlette.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-
+from typing import List, Annotated
+from routers.auth import get_current_user
 from database import SessionLocal
 from modules import Users
-from routers.auth import get_current_user
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 templates = Jinja2Templates(directory="templates")
@@ -24,8 +22,20 @@ def get_db():
         db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
+
+DEFAULT_THRESHOLD = 0.35
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
+RT_THRESHOLD = 0.32
+
+class RecognizedFace(BaseModel):
+    name: str
+    bbox: List[float]
+    distance: float
+    similarity: float
+
+class RecognizeResponse(BaseModel):
+    results: List[RecognizedFace]
 
 class UserRequest(BaseModel):
     username: str = Field(min_length=1, max_length=64)

@@ -40,10 +40,11 @@ if (form) {
         btn.disabled = false;
 
     });
-    }
+}
 
 
 function logout() {
     localStorage.removeItem("access_token");
     window.location.href = 'login';
 }
+

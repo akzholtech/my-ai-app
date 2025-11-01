@@ -1,5 +1,5 @@
 {% include 'layout.html' %}
-<div class="container">
+<div class="container" id="main">
       <div class="login-box">
     <!-- Vivid AI SVG Illustration -->
     <svg class="ai-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="AI Robot Head">
@@ -28,11 +28,11 @@
     <form id="loginForm">
         <p id="msg"></p>
       <div class="input-group">
-        <input type="text" id="username" name="username" placeholder=" " required />
+        <input type="text" id="username" name="username" placeholder=" " />
         <label for="username">Username</label>
       </div>
       <div class="input-group">
-        <input type="password" id="password" name="password" placeholder=" " required />
+        <input type="password" id="password" name="password" placeholder=" " />
         <label for="password">Password</label>
       </div>
       <button class="login-btn" id="loginBtn" type="submit">Login</button>
@@ -40,7 +40,33 @@
         <a href="#">Forgot Password?</a>
       </div>
         <span class="alternative_option">or</span>
-      <button class="login-btn" onclick="streaming(600, 400)">Face ID</button>
+      <button class="login-btn" onclick="openIframePopup('http://127.0.0.1:8000/run-recognition')">Face ID</button>
+        <div id="iframe-overlay">
+            <div id="iframe-popup">
+              <button class="close-btn" onclick="closeIframePopup()">×</button>
+              <img src="" id="popup-iframe" alt="">
+            </div>
+        </div>
     </form>
   </div>
 </div>
+<script>
+    function openIframePopup(url) {
+      const overlay = document.getElementById('iframe-overlay');
+      const iframe = document.getElementById('popup-iframe');
+      const container = document.getElementById('main');
+      iframe.src = url;
+      overlay.style.display = 'flex';
+      container.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    }
+
+    function closeIframePopup() {
+      const overlay = document.getElementById('iframe-overlay');
+      const iframe = document.getElementById('popup-iframe');
+      const container = document.getElementById('main');
+      iframe.src = ''; // Clear URL to stop loading
+      overlay.style.display = 'none';
+      container.style.backgroundColor = 'transparent';
+    }
+
+</script>
